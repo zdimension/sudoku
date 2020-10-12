@@ -297,7 +297,7 @@ private:
     struct killer_val
     {
         int sum;
-        int count;
+        unsigned int count;
     };
 
     struct cell_pos
@@ -711,7 +711,7 @@ private:
                 },
                 {{45, {{1, 2, 3, 4, 5, 6, 7, 8, 9}}}}};
 
-        for (int i = 0; i < killer_vals.size(); i++)
+        for (unsigned int i = 0; i < killer_vals.size(); i++)
         {
             if (killer_cells[i].size() == 1)
             {
