@@ -9,7 +9,7 @@ g++ -std=c++17 -O3 sudoku.cpp -o sudoku
 
 ## Usage
 
-### Sudoku normal
+### Normal Sudoku
 
 Pass the grid as a space-separated list of lines. Replace unknowns by any non-numeric symbol.
 
@@ -19,7 +19,7 @@ Pass the grid as a space-separated list of lines. Replace unknowns by any non-nu
 ./sudoku 86xxxxx2x xxxx6xxxx xx42x16xx 4xx5xx26x xx61x94xx x13xx6xx9 xx54x39xx xxxx1xxxx x8xxxxx74
 ```
 
-### Sudoku killer
+### Killer Sudoku
 
 Add the `-k` switch, assign a symbol to each region (starting at 0, use lowercase letters afterwards) and pass the regions' values as a comma-separated list of numbers.
 
