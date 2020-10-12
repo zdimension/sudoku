@@ -484,7 +484,7 @@ private:
                             for (int x = 0; x < 3; x++)
                             {
                                 int ry = cpy + y;
-                                int rx = cpy + x;
+                                int rx = cpx + x;
 
                                 if (grille[ry][rx] != 0)
                                     continue;
