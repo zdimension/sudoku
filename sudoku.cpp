@@ -217,7 +217,7 @@ public:
 
     Solver(Grid &grille, std::optional<std::vector<int>> killer = std::nullopt)
     {
-        if (this->killer = killer.has_value())
+        if ((this->killer = killer.has_value()))
         {
             zero_fill();
             this->grille_killer = grille;
