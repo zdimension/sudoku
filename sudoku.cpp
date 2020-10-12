@@ -11,6 +11,7 @@
 #include <optional>
 #include <tuple>
 #include <map>
+#include <fstream>
 
 constexpr int N = 9;
 constexpr int Ncar = sqrt(N);
@@ -24,6 +25,13 @@ typedef uint_fast8_t case_t;
 typedef case_t vect[N];
 
 using Grid = std::array<std::array<case_t, N>, N>;
+
+typedef struct 
+{
+    int dx;
+    int dy;
+    int dv;
+} rule;
 
 char *vide;
 
@@ -215,8 +223,10 @@ public:
         zero_fill();
     }
 
-    Solver(Grid &grille, std::optional<std::vector<int>> killer = std::nullopt)
+    Solver(Grid &grille, std::optional<std::vector<int>> killer = std::nullopt, std::vector<rule> rules = {})
     {
+        this->rules = rules;
+
         if ((this->killer = killer.has_value()))
         {
             zero_fill();
@@ -315,6 +325,7 @@ private:
     uint32_t mask = ((1 << N) - 1) << 1;
     std::array<std::array<uint32_t, N>, N> excl = {0};
     uint32_t *excl_lin = &excl[0][0];
+    std::vector<rule> rules;
 
     void zero_fill()
     {
@@ -753,6 +764,34 @@ private:
         }
     }
 
+    bool check_rules()
+    {
+        for (rule r : rules)
+        {
+            for (int y = 0; y < N; y++)
+                for (int x = 0; x < N; x++)
+                {
+                    int nx = x + r.dx;
+                    int ny = y + r.dy;
+                    if (!(nx > 0 && nx < N) || !(ny > 0 && ny < N))
+                        continue;
+                    int nval = grille[ny][nx];
+                    if (nval == 0)
+                        continue;
+                    int val = grille[y][x];
+                    if (val == 0)
+                        continue;
+                    if (abs(val - nval) == r.dv)
+                    {
+                        //printf("règle %d %d %d violée en %d %d\n", r.dx, r.dy, r.dv, x, y);
+                        return true;
+                    }
+                }
+        }
+
+        return false;
+    }
+
     void solve_exhaust(int cset)
     {
         if (!killer)
@@ -847,9 +886,16 @@ private:
                 int l = i.top() / N;
                 int c = i.top() % N;
 
-                if (verif(grille, c, l) || (killer && check_killer_regions()))
+                if (verif(grille, c, l) || (killer && check_killer_regions()))// || check_rules())
                 {
                     // backtrack
+                    continue;
+                }
+                else if (check_rules())
+                {
+                    /*printf("\n");
+                    afficher(grille);
+                    getchar();*/
                     continue;
                 }
                 else
@@ -909,11 +955,20 @@ int main(int argc, char *argv[])
     bool killer = false;
     std::vector<int> killer_vals;
 
+    bool ruleset = false;
+    std::vector<rule> rules;
+
     if (argc > 1)
     {
         if (strcmp(args[0], "-k") == 0)
         {
             killer = true;
+            args++;
+            argc--;
+        }
+        else if (strcmp(args[0], "-r") == 0)
+        {
+            ruleset = true;
             args++;
             argc--;
         }
@@ -950,6 +1005,15 @@ int main(int argc, char *argv[])
                 }
                 printf("\n");
             }
+            else if (ruleset)
+            {
+                std::ifstream file(*ligne);
+                rule r;
+                while (file >> r.dx >> r.dy >> r.dv)
+                {
+                    rules.push_back(r);
+                }
+            }
         }
     }
     else
@@ -960,7 +1024,7 @@ int main(int argc, char *argv[])
     if (!killer)
         afficher(grille);
 
-    Solver s(grille, killer ? std::optional(killer_vals) : std::nullopt);
+    Solver s(grille, killer ? std::optional(killer_vals) : std::nullopt, rules);
     s.solve();
 
     printf("\n");
